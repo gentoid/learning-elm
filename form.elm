@@ -2,6 +2,7 @@ import Html exposing (..)
 import Html.App as Html
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
+import String
 
 main: Program Never
 main =
@@ -46,7 +47,11 @@ view model =
 viewValidation: Model -> Html Msg
 viewValidation model =
   let
+    longEnough = String.length model.password >= 8
     (color, message) =
+      if not longEnough then
+        ("red", "Password's too short!")
+      else
       if model.password == model.passwordAgain then
         ("green", "OK")
       else
