@@ -3,6 +3,7 @@ import Html.App as Html
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
 import String
+import Regex exposing (contains, regex)
 
 main: Program Never
 main =
@@ -48,7 +49,14 @@ viewValidation: Model -> Html Msg
 viewValidation model =
   let
     longEnough = String.length model.password >= 8
+    allChars =
+          contains (regex "\\d+")  model.password
+      &&  contains (regex "[a-z]") model.password
+      &&  contains (regex "[A-Z]") model.password
     (color, message) =
+      if not allChars then
+        ("red", "Password must contain digits, upper and lower case chars")
+      else
       if not longEnough then
         ("red", "Password's too short!")
       else
