@@ -13,16 +13,18 @@ type alias Model =
   { name: String
   , password: String
   , passwordAgain: String
+  , age: String
   }
 
 model: Model
 model =
-  Model "" "" ""
+  Model "" "" "" ""
 
 type Msg
   = Name String
   | Password String
   | PasswordAgain String
+  | Age String
 
 update: Msg -> Model -> Model
 update msg model =
@@ -36,12 +38,16 @@ update msg model =
     PasswordAgain password ->
       { model | passwordAgain = password }
 
+    Age age ->
+      { model | age = age }
+
 view: Model -> Html Msg
 view model =
   div []
     [ input [ type' "text", placeholder "Name", onInput Name ] []
     , input [ type' "password", placeholder "Password", onInput Password ] []
     , input [ type' "password", placeholder "Re-enter password", onInput PasswordAgain ] []
+    , input [ type' "text", placeholder "Age", onInput Age ] []
     , viewValidation model
     ]
 
@@ -53,7 +59,11 @@ viewValidation model =
           contains (regex "\\d+")  model.password
       &&  contains (regex "[a-z]") model.password
       &&  contains (regex "[A-Z]") model.password
+    integerAge = contains (regex "^\\d+$")  model.age
     (color, message) =
+      if not integerAge then
+        ("red", "Age nust be an integer")
+      else
       if not allChars then
         ("red", "Password must contain digits, upper and lower case chars")
       else
