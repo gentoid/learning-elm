@@ -1,7 +1,7 @@
 import Html exposing (..)
 import Html.App as Html
 import Html.Attributes exposing (..)
-import Html.Events exposing (onInput)
+import Html.Events exposing (onInput, onClick)
 import String
 import Regex exposing (contains, regex)
 
@@ -14,20 +14,24 @@ type alias Model =
   , password: String
   , passwordAgain: String
   , age: String
+  , check: Bool
   }
 
 model: Model
 model =
-  Model "" "" "" ""
+  Model "" "" "" "" False
 
 type Msg
   = Name String
   | Password String
   | PasswordAgain String
   | Age String
+  | Submit
 
 update: Msg -> Model -> Model
 update msg model =
+  let model = { model | check = False }
+  in
   case msg of
     Name name ->
       { model | name = name }
@@ -41,6 +45,9 @@ update msg model =
     Age age ->
       { model | age = age }
 
+    Submit ->
+      { model | check = True }
+
 view: Model -> Html Msg
 view model =
   div []
@@ -49,6 +56,7 @@ view model =
     , input [ type' "password", placeholder "Re-enter password", onInput PasswordAgain ] []
     , input [ type' "text", placeholder "Age", onInput Age ] []
     , viewValidation model
+    , button [ onClick Submit ] [ text "Submit" ]
     ]
 
 viewValidation: Model -> Html Msg
@@ -61,6 +69,9 @@ viewValidation model =
       &&  contains (regex "[A-Z]") model.password
     integerAge = contains (regex "^\\d+$")  model.age
     (color, message) =
+      if not model.check then
+        ("green", "Just click 'Submit' once you're ready")
+      else
       if not integerAge then
         ("red", "Age nust be an integer")
       else
