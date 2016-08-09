@@ -19,11 +19,12 @@ main =
 type alias Model =
   { topic : String
   , gifUrl : String
+  , errorMessage : String
   }
 
 init : (Model, Cmd Msg)
 init =
-  (Model "cats" "waiting.gif", Cmd.none)
+  (Model "cats" "waiting.gif" "", Cmd.none)
 
 type Msg
   = MorePlease
@@ -37,10 +38,20 @@ update msg model =
       (model, getRandomGif model.topic)
 
     FetchSuccess newUrl ->
-      (Model model.topic newUrl, Cmd.none)
+      ({ model | gifUrl = newUrl, errorMessage = "" }, Cmd.none)
 
-    FetchFail _ ->
-      (model, Cmd.none)
+    FetchFail Http.Timeout ->
+      ({ model | errorMessage = "Timeout" }, Cmd.none)
+
+    FetchFail Http.NetworkError ->
+      ({ model | errorMessage = "NetworkError" }, Cmd.none)
+
+    FetchFail (Http.UnexpectedPayload message) ->
+      ({ model | errorMessage = message }, Cmd.none)
+
+    FetchFail (Http.BadResponse code message) ->
+      ({ model | errorMessage = (toString code) ++ message }, Cmd.none)
+
 
 view : Model -> Html Msg
 view model =
@@ -48,6 +59,7 @@ view model =
     [ h2 [] [ text model.topic ]
     , img [src model.gifUrl] []
     , button [ onClick MorePlease ] [ text "More please!" ]
+    , span [] [ text model.errorMessage ]
     ]
 
 subscriptions : Model -> Sub Msg
