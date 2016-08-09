@@ -30,6 +30,7 @@ type Msg
   = MorePlease
   | FetchSuccess String
   | FetchFail Http.Error
+  | UpdateTopic String
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -52,11 +53,13 @@ update msg model =
     FetchFail (Http.BadResponse code message) ->
       ({ model | errorMessage = (toString code) ++ message }, Cmd.none)
 
+    UpdateTopic newTopic ->
+      ({ model | topic = newTopic }, Cmd.none)
 
 view : Model -> Html Msg
 view model =
   div []
-    [ h2 [] [ text model.topic ]
+    [ input [ type' "text", value model.topic, onInput UpdateTopic ] []
     , img [src model.gifUrl] []
     , button [ onClick MorePlease ] [ text "More please!" ]
     , span [] [ text model.errorMessage ]
