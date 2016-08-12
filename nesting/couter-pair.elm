@@ -52,4 +52,8 @@ view model =
     , App.map Bottom (Counter.view model.bottomCounter)
     , button [ onClick Reset ] [text "Reset" ]
     , button [ onClick Swap ] [ text "Swap" ]
+    , div []
+      [ text ("Maximum is " ++ toString (max model.topCounter model.bottomCounter)) ]
+    , div []
+      [ text ("Minimum is " ++ toString (min model.topCounter model.bottomCounter)) ]
     ]
